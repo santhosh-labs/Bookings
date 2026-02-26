@@ -1,0 +1,220 @@
+I want to build a professional SaaS appointment booking platform frontend similar to enterprise tools like Zoho Bookings.
+
+IMPORTANT:
+- Frontend only
+- No backend
+- No database
+- Use mock JSON data
+- Use React state only
+- Make it scalable for later backend integration
+
+Tech Stack:
+- React (Vite)
+- Tailwind CSS
+- React Router
+- @headlessui/react (for modals & dropdowns)
+- Lucide React (icons)
+- date-fns (date handling)
+- @fullcalendar/react (for calendar view)
+
+--------------------------------------------
+APP STRUCTURE
+--------------------------------------------
+
+Create a multi-page SaaS dashboard UI with:
+
+1. Authentication Pages (UI Only)
+- Login page
+- Register page
+- Clean modern layout
+- Illustration placeholder
+- Responsive
+
+--------------------------------------------
+
+2. Dashboard Layout
+
+Main Layout:
+- Dark left sidebar
+- White main content area
+- Top navbar
+
+Sidebar menu:
+- Dashboard
+- Bookings
+- Services
+- Availability
+- Customers
+- Settings
+
+Top Navbar:
+- Organization name
+- Search icon
+- Notification icon
+- Profile avatar dropdown
+
+--------------------------------------------
+
+3. Dashboard Home Page
+
+Show:
+- Today’s bookings card
+- Upcoming bookings card
+- Total bookings stat
+- Revenue stat (mock data)
+- Mini calendar preview
+- Recent bookings list
+
+--------------------------------------------
+
+4. Services Page
+
+Features:
+- List of services (mock data)
+- Create service modal
+- Edit service modal
+- Toggle active/inactive
+- Service card view
+
+Each service includes:
+- Name
+- Duration
+- Price
+- Buffer time
+- Location (Online/Offline)
+- Active status badge
+
+--------------------------------------------
+
+5. Availability Page
+
+UI for:
+- Weekly schedule (Mon–Sun)
+- Time range selector
+- Add multiple time slots per day
+- Toggle day on/off
+- Holiday override section
+- Timezone selector dropdown
+
+Use mock state for storing availability.
+
+--------------------------------------------
+
+6. Bookings Page
+
+Two tabs:
+- List View
+- Calendar View
+
+List View:
+- Table layout
+- Columns:
+  - Customer name
+  - Service
+  - Date
+  - Time
+  - Status
+- Filter dropdown
+- Search input
+- Status badge
+- Action menu (Cancel, Reschedule, Mark complete)
+
+Calendar View:
+- Monthly view
+- Weekly view
+- Click event modal
+- Styled modern calendar
+
+--------------------------------------------
+
+7. Public Booking Page (Customer Facing)
+
+Route example:
+  /book/demo-org
+
+UI Flow:
+1. Select service
+2. Select date (calendar)
+3. Select available time slot
+4. Enter name
+5. Enter email
+6. Enter phone
+7. Confirm booking
+8. Success screen
+
+Features:
+- Clean modern layout
+- Centered card
+- Step-based progress UI
+- Smooth transitions
+- Responsive mobile design
+
+Use mock availability data to generate available time slots.
+
+--------------------------------------------
+
+8. Customers Page
+
+- List of customers
+- Total bookings per customer
+- Search bar
+- Click to view booking history modal
+
+--------------------------------------------
+
+9. Settings Page
+
+Tabs:
+- Organization Profile
+- Branding
+- Notification Settings
+- Booking Page Customization
+
+UI Only — no persistence required.
+
+--------------------------------------------
+
+DESIGN REQUIREMENTS
+
+- Enterprise SaaS style
+- Clean spacing
+- Subtle shadows
+- Rounded corners
+- Soft gray backgrounds
+- Primary accent color: teal or indigo
+- Smooth hover transitions
+- Animated modals
+- Fully responsive
+- Mobile-first friendly
+
+--------------------------------------------
+
+COMPONENT STRUCTURE
+
+Generate:
+
+- src/layouts/DashboardLayout.jsx
+- src/components/Sidebar.jsx
+- src/components/Topbar.jsx
+- src/pages/Dashboard.jsx
+- src/pages/Bookings.jsx
+- src/pages/Services.jsx
+- src/pages/Availability.jsx
+- src/pages/Customers.jsx
+- src/pages/Settings.jsx
+- src/pages/PublicBooking.jsx
+- src/components/modals/CreateServiceModal.jsx
+- src/components/calendar/CalendarView.jsx
+- src/components/BookingStepWizard.jsx
+
+Use clean reusable components.
+Use mock JSON data.
+Use functional components with hooks.
+Keep code modular and scalable.
+
+--------------------------------------------
+
+Make it look like a real production SaaS UI.
+Do not include backend logic.
+Do not include database logic.
+Only frontend structure and working UI.
