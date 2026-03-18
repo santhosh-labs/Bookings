@@ -1,0 +1,24 @@
+import "dotenv/config";
+import mysql from 'mysql2/promise';
+
+async function listUsers() {
+    if (!process.env.DATABASE_URL) {
+        console.error("DATABASE_URL not set");
+        return;
+    }
+
+    try {
+        const connection = await mysql.createConnection(process.env.DATABASE_URL);
+        const [rows]: any = await connection.execute("SELECT * FROM staff");
+        console.log("Current Users in DB:");
+        rows.forEach((u: any) => {
+            console.log(`- ID: ${u.id}, Username: ${u.username}, Name: ${u.name}, Email: ${u.email}`);
+        });
+        
+        await connection.end();
+    } catch (err: any) {
+        console.error("Error listing users:", err.message);
+    }
+}
+
+listUsers();

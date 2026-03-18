@@ -1,0 +1,242 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: 'Inter', sans-serif;
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+
+    /* Light Theme — Nordic Minimal */
+    --background: 210 20% 98%;
+    /* #F8F9FA */
+    --foreground: 215 28% 17%;
+    /* #1E293B */
+
+    --card: 0 0% 100%;
+    /* White */
+    --card-foreground: 215 28% 17%;
+    --card-border: 214 32% 91%;
+    /* #E2E8F0 */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    --popover-border: 214 32% 91%;
+
+    /* Slate Blue / Navy Primary */
+    --primary: 215 28% 27%;
+    /* Slate 700 / #334155 */
+    --primary-foreground: 0 0% 100%;
+    --primary-border: 215 32% 17%;
+    /* Slate 800 / #1E293B */
+
+    --secondary: 210 40% 96%;
+    /* Slate 100 */
+    --secondary-foreground: 215 16% 47%;
+    /* Slate 500 */
+    --secondary-border: 214 32% 91%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --muted-border: 214 32% 91%;
+
+    /* Sage Green Accent */
+    --accent: 101 32% 55%;
+    /* #7FB069 */
+    --accent-foreground: 0 0% 100%;
+    --accent-border: 101 32% 45%;
+
+    /* Red 500 */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-border: 0 72% 51%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 215 28% 27%;
+    /* Slate 700 */
+
+    --radius: 0.75rem;
+
+    /* Sidebar mappings */
+    --sidebar-background: 221 39% 11%;
+    /* #111827 */
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 150 74% 39%;
+    /* #1AAE64 */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 28% 17%;
+    /* #1F2937 */
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 215 28% 17%;
+    --sidebar-ring: 150 74% 39%;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.07), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark {
+    --background: 222 47% 9%;
+    --foreground: 210 40% 95%;
+
+    --card: 222 47% 12%;
+    --card-foreground: 210 40% 95%;
+    --card-border: 222 47% 20%;
+
+    --popover: 222 47% 12%;
+    --popover-foreground: 210 40% 95%;
+    --popover-border: 222 47% 20%;
+
+    --primary: 217 91% 62%;
+    --primary-foreground: 222 47% 6%;
+    --primary-border: 217 91% 55%;
+
+    --secondary: 222 47% 18%;
+    --secondary-foreground: 210 40% 90%;
+    --secondary-border: 222 47% 25%;
+
+    --muted: 222 47% 15%;
+    --muted-foreground: 215 20% 60%;
+    --muted-border: 222 47% 20%;
+
+    --accent: 172 50% 18%;
+    --accent-foreground: 172 50% 85%;
+    --accent-border: 172 50% 28%;
+
+    --destructive: 0 63% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-border: 0 63% 43%;
+
+    --border: 222 47% 20%;
+    --input: 222 47% 18%;
+    --ring: 217 91% 62%;
+
+    --sidebar-background: 222 47% 7%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 217 91% 62%;
+    --sidebar-primary-foreground: 222 47% 6%;
+    --sidebar-accent: 222 47% 14%;
+    --sidebar-accent-foreground: 210 40% 90%;
+    --sidebar-border: 222 47% 14%;
+    --sidebar-ring: 217 91% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* FullCalendar Customizations */
+.fc {
+  --fc-border-color: hsl(var(--border));
+  --fc-button-bg-color: hsl(var(--card));
+  --fc-button-border-color: hsl(var(--border));
+  --fc-button-text-color: hsl(var(--foreground));
+  --fc-button-hover-bg-color: hsl(var(--primary) / 0.08);
+  --fc-button-hover-border-color: hsl(var(--primary));
+  --fc-button-active-bg-color: hsl(var(--primary));
+  --fc-button-active-border-color: hsl(var(--primary));
+  --fc-button-active-text-color: hsl(var(--primary-foreground));
+  --fc-event-bg-color: hsl(var(--primary) / 0.1);
+  --fc-event-border-color: hsl(var(--primary) / 0.3);
+  --fc-event-text-color: hsl(var(--primary));
+  --fc-today-bg-color: hsl(var(--primary) / 0.06);
+  font-family: var(--font-sans);
+}
+
+.fc .fc-toolbar-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.fc .fc-button {
+  @apply rounded-md text-sm font-medium transition-colors;
+  box-shadow: var(--shadow-sm);
+}
+
+.fc .fc-event {
+  @apply rounded-md border-l-4 border-l-primary font-medium px-1;
+}
+
+/* Enter animations */
+.animate-in {
+  animation: animate-in 0.25s ease-out;
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle gradient animation */
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient-shift 5s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% center;
+  }
+
+  50% {
+    background-position: 100% center;
+  }
+
+  100% {
+    background-position: 0% center;
+  }
+}
+
+/* Remove neon glow effects */
+[class*="drop-shadow-[0_0"] {
+  filter: none !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}

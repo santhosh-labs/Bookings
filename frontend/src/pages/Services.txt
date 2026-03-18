@@ -1,0 +1,137 @@
+import { useState } from "react";
+import { Plus, Search, ChevronDown, Grid, List, Share, User } from "lucide-react";
+import CreateServiceModal from "../components/modals/CreateServiceModal";
+import { useWorkspace } from "../contexts/WorkspaceContext";
+import { useServices } from "../hooks/use-services";
+
+export default function Services() {
+    const { currentWorkspace, workspaces } = useWorkspace();
+    const { data: services, refresh } = useServices(currentWorkspace?.id ?? null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    if (workspaces.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
+                <h2 className="text-3xl font-bold text-foreground drop-shadow-md">No Workspaces Found</h2>
+                <p className="text-foreground/70 text-lg font-medium">Please create a workspace to view its interviews.</p>
+            </div>
+        );
+    }
+
+    const filteredServices = services.filter(service =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="space-y-8 relative z-10 w-full">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center cursor-pointer drop-shadow-sm group">
+                        Active Interviews
+                        <span className="ml-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-black shadow-[0_0_10px_rgba(59,130,246,0.25)] group- transition-transform">{filteredServices.length}</span>
+                        <ChevronDown className="w-6 h-6 text-muted-foreground ml-2 group-hover:text-primary transition-colors" />
+                    </h1>
+                </div>
+
+                <div className="flex items-center gap-4 flex-wrap sm:flex-nowrap w-full sm:w-auto">
+                    <div className="relative group flex items-center flex-1 sm:flex-none">
+                        <Search className="w-5 h-5 text-muted-foreground absolute left-4 group-focus-within:text-primary transition-colors" />
+                        <input
+                            type="text"
+                            placeholder="Search Interviews"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-12 pr-4 py-3 bg-white border border-border focus:border-primary focus:ring-4 focus:ring-primary/20 rounded-2xl text-base font-semibold text-foreground outline-none transition-all w-full sm:w-64 shadow-inner placeholder:text-muted-foreground"
+                        />
+                    </div>
+
+                    <div className="flex items-center bg-white border border-border rounded-xl p-1 shadow-sm shrink-0">
+                        <button className="p-2 bg-background shadow-md text-foreground rounded-lg transition-transform hover:opacity-90 border border-border">
+                            <Grid className="w-5 h-5 drop-shadow-sm" />
+                        </button>
+                        <button className="p-2 text-muted-foreground hover:text-foreground rounded-lg transition-all hover:bg-muted">
+                            <List className="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-2xl font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] transition-all text-base flex items-center justify-center gap-3 shrink-0 hover:opacity-90 w-full sm:w-auto"
+                    >
+                        <Plus className="w-5 h-5 stroke-[3px]" />
+                        New Interview
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pt-4">
+                {filteredServices.map(service => (
+                    <div key={service.id} className="bg-white border border-border rounded-xl overflow-hidden hover:shadow-[0_0_30px_rgba(59,130,246,0.08)]  transition-all flex flex-col cursor-pointer group relative shadow-lg">
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-primary/5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        <div className="p-6 flex items-start gap-5 relative z-10">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl shrink-0 shadow-inner group- transition-transform ${service.color === 'emerald' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
+                                service.color === 'violet' ? 'bg-orange-500/20 text-orange-500 border border-orange-500/30' :
+                                    service.color === 'rose' ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30' :
+                                        service.color === 'amber' ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' :
+                                            service.color === 'sky' ? 'bg-sky-500/20 text-sky-500 border border-sky-500/30' :
+                                                'bg-primary/20 text-primary border border-primary/30' // default
+                                }`}>
+                                {service.name.substring(0, 2).toUpperCase()}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-lg text-foreground truncate drop-shadow-sm">{service.name}</h3>
+                                <div className="text-sm text-muted-foreground font-medium mt-1 flex items-center gap-2">
+                                    <span className="bg-muted px-2 py-0.5 rounded-md border border-border">{service.duration} mins</span>
+                                    <span className="text-border">�</span>
+                                    <span className="bg-muted px-2 py-0.5 rounded-md border border-border">One-on-One</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="px-6 py-4 border-t border-border flex items-center justify-between mt-auto bg-white relative z-10">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shadow-inner border border-primary/30">
+                                    <User className="w-4 h-4" />
+                                </div>
+                                <span className="text-sm font-bold text-foreground">John Doe</span>
+                            </div>
+
+                            <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-xl text-sm font-bold text-foreground bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-sm">
+                                <Share className="w-4 h-4" />
+                                Share
+                            </button>
+                        </div>
+                    </div>
+                ))}
+
+                {filteredServices.length === 0 && (
+                    <div className="col-span-full py-20 text-center bg-white rounded-xl border border-border mt-4 shadow-lg flex flex-col items-center">
+                        <div className="w-24 h-24 bg-primary/10 rounded-xl flex items-center justify-center mb-6 border border-primary/20 shadow-inner drop-shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                            <List className="w-10 h-10 text-primary animate-pulse" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-3">No Interviews added</h2>
+                        <p className="text-foreground/70 mb-8 text-base max-w-md mx-auto font-medium">Add Interviews to create different service categories with their own unique availability and pricing.</p>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-primary hover:bg-primary/90 text-white px-8 py-3.5 rounded-2xl font-bold shadow-[0_0_15px_rgba(59,130,246,0.25)] transition-all text-base inline-flex items-center justify-center gap-3 hover:opacity-90"
+                        >
+                            <Plus className="w-5 h-5 stroke-[3px]" />
+                            New Interview
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            <CreateServiceModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                workspaceId={currentWorkspace?.id}
+                onSuccess={refresh}
+            />
+        </div>
+    );
+}
+

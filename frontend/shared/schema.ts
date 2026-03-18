@@ -10,7 +10,6 @@ export const workspaces = mysqlTable("workspaces", {
   logo: text("logo"),
   currency: varchar("currency", { length: 20 }).notNull().default("USD"),
   timezone: varchar("timezone", { length: 50 }).notNull().default("UTC"),
-  ownerId: int("owner_id"),
   theme: json("theme").$type<{
     primaryColor?: string;
     secondaryColor?: string;
@@ -19,23 +18,6 @@ export const workspaces = mysqlTable("workspaces", {
     showHeader?: boolean;
     headerTitle?: string;
   }>(),
-});
-
-export const users = mysqlTable("users", {
-  id: int("id").primaryKey().autoincrement(),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  password: text("password").notNull(),
-  avatar: text("avatar"),
-  createdAt: varchar("created_at", { length: 50 }).notNull(),
-});
-
-export const memberships = mysqlTable("memberships", {
-  id: int("id").primaryKey().autoincrement(),
-  userId: int("user_id").notNull(),
-  workspaceId: int("workspace_id").notNull(),
-  role: varchar("role", { length: 50 }).notNull(), // "OWNER" | "STAFF"
-  createdAt: varchar("created_at", { length: 50 }).notNull(),
 });
 
 export const staff = mysqlTable("staff", {
@@ -160,8 +142,6 @@ export const workflows = mysqlTable("workflows", {
 });
 
 export const insertWorkspaceSchema = createInsertSchema(workspaces).omit({ id: true });
-export const insertUserSchema = createInsertSchema(users).omit({ id: true });
-export const insertMembershipSchema = createInsertSchema(memberships).omit({ id: true });
 export const insertStaffSchema = createInsertSchema(staff).omit({ id: true });
 export const insertServiceSchema = createInsertSchema(services).omit({ id: true });
 export const insertCustomerSchema = createInsertSchema(customers).omit({ id: true });
@@ -170,8 +150,6 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
 export const insertWorkflowSchema = createInsertSchema(workflows).omit({ id: true });
 
 export type Workspace = typeof workspaces.$inferSelect;
-export type User = typeof users.$inferSelect;
-export type Membership = typeof memberships.$inferSelect;
 export type Staff = typeof staff.$inferSelect;
 export type Service = typeof services.$inferSelect;
 export type Customer = typeof customers.$inferSelect;

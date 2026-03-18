@@ -74,33 +74,10 @@ export const api = {
     },
   },
   auth: {
-    login: {
-      method: "POST" as const,
-      path: "/api/login" as const,
-      input: z.object({ email: z.string().email(), password: z.string() }),
-      responses: { 200: z.any() }
-    },
-    register: {
-      method: "POST" as const,
-      path: "/api/register" as const,
-      input: z.object({ 
-        name: z.string(), 
-        email: z.string().email(), 
-        password: z.string(),
-        organizationName: z.string().optional()
-      }),
-      responses: { 201: z.any() }
-    },
-    switchWorkspace: {
-      method: "POST" as const,
-      path: "/api/auth/switch-workspace" as const,
-      input: z.object({ organizationId: z.number() }),
-      responses: { 200: z.any() }
-    },
     me: {
       method: 'GET' as const,
       path: '/api/me' as const,
-      responses: { 200: z.any() } // Will return User
+      responses: { 200: z.custom<typeof staff.$inferSelect>() }
     }
   },
   customers: {
