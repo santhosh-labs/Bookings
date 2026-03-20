@@ -106,13 +106,13 @@ export default function Sidebar() {
     const { user: me, logout } = useAuth();
     const [collapsed, setCollapsed] = useState(false);
 
-    const isOwner = role === "OWNER" || currentWorkspace === null;
+    const isOwner = role === "SUPER_ADMIN" || currentWorkspace === null;
 
     const sections = (currentWorkspace === null ? MY_SPACE_NAV : WORKSPACE_NAV).map(section => ({
         ...section,
         items: section.items.filter(item => {
-            // Hide Users from staff in workspace view
-            if (item.name === "Users" && role === "STAFF") return false;
+            // Only Super Admins can see MANAGEMENT and SETTINGS in workspace view
+            if (currentWorkspace !== null && role !== "SUPER_ADMIN" && section.label !== "MAIN") return false;
             return true;
         })
     }));
@@ -151,13 +151,21 @@ export default function Sidebar() {
                 >
                     <Select
                         value={currentWorkspace === null ? "all" : currentWorkspace.id.toString()}
-                        onValueChange={(val) => {
-                            if (val === "new") navigate("/workspaces/new");
-                            else {
+                        onValueChange={async (val) => {
+                            if (val === "new") {
+                                navigate("/workspaces/new");
+                            } else {
                                 const newWsId = val === "all" ? null : Number(val);
-                                setCurrentWorkspaceById(newWsId);
-                                queryClient.invalidateQueries(); // Refresh all data for new workspace context
-                                navigate("/dashboard"); // Always reset to dashboard when switching
+                                await setCurrentWorkspaceById(newWsId);
+                                
+                                // Smart navigation: stay on page if it's a list view, otherwise reset to dashboard
+                                // e.g. /bookings -> /bookings, but /booking-pages/123 -> /dashboard
+                                const pathParts = location.pathname.split('/').filter(Boolean);
+                                if (pathParts.length > 1 && !['dashboard', 'calendar', 'bookings', 'services', 'availability', 'customers', 'workflows', 'recruiters', 'settings'].includes(pathParts[0])) {
+                                    navigate("/dashboard");
+                                } else {
+                                    navigate(location.pathname);
+                                }
                             }
                         }}
                     >
@@ -277,9 +285,7 @@ export default function Sidebar() {
             </div>
 
             {/* -- Bottom user ----------------------------------------- */}
-            <div
-                className="px-2 py-3 shrink-0 border-t border-slate-200"
-            >
+            <div className="px-2 py-3 shrink-0 border-t border-slate-200 space-y-1">
                 <Link
                     to="/profile"
                     title={collapsed ? "My Profile" : undefined}
@@ -291,24 +297,31 @@ export default function Sidebar() {
                     `}
                 >
                     <div className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-white text-[11px] font-bold shrink-0 shadow overflow-hidden uppercase">
-                        {me?.name ? me.name.split(' ').map((n: string) => n[0]).join('') : "JD"}
+                        {me?.name ? me.name.split(' ').map((n: string) => n[0]).join('') : "U"}
                     </div>
                     {!collapsed && (
                         <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-[13px] text-slate-800 leading-none truncate">{me?.name || "John Doe"}</p>
-                            <p className="text-[11px] mt-0.5 truncate text-slate-400">{role || "User"}</p>
+                            <p className="font-semibold text-[13px] text-slate-800 leading-none truncate">{me?.name || "User"}</p>
+                            <p className="text-[11px] mt-0.5 truncate text-slate-400 font-bold uppercase tracking-tight">{role?.replace('_', ' ') || "MEMBER"}</p>
                         </div>
                     )}
-                    <button 
-                        onClick={() => {
-                            logout.mutateAsync().then(() => navigate("/login"));
-                        }}
-                        className="p-1.5 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors group"
-                        title="Logout"
-                    >
-                        <LogOut size={14} className="opacity-40 group-hover:opacity-100" />
-                    </button>
                 </Link>
+                <button 
+                    onClick={async () => {
+                        await logout.mutateAsync();
+                        localStorage.clear();
+                        navigate("/login");
+                    }}
+                    className={`
+                        w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
+                        text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all font-medium text-sm
+                        ${collapsed ? "justify-center" : ""}
+                    `}
+                    title="Logout"
+                >
+                    <LogOut size={16} className={collapsed ? "" : "mr-0.5"} />
+                    {!collapsed && <span>Logout</span>}
+                </button>
             </div>
         </div>
     );

@@ -13,6 +13,16 @@ const __dirname = path.dirname(__filename);
 
 import { setupAuth } from "./auth";
 
+// Global error handlers to prevent silent crashes
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandle Rejection at:", promise, "reason:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+  // Optional: Graceful shutdown if needed, but for now just log it
+});
+
 const app = express();
 const httpServer = createServer(app);
 
@@ -33,7 +43,7 @@ app.use(
 app.use(express.urlencoded({ extended: false }));
 
 // Create uploads directory if it doesn't exist
-const uploadsDir = path.resolve(process.cwd(), "backend", "uploads");
+const uploadsDir = path.resolve(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }

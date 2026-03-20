@@ -5,10 +5,11 @@ export function useRecruiters(workspaceId?: number | null) {
     const { data = [], isLoading, refetch } = useQuery<any[]>({
         queryKey: ["/api/users", { workspaceId }],
         queryFn: async () => {
-            const url = "/api/users";
+            const url = workspaceId ? `/api/users?workspaceId=${workspaceId}` : "/api/users";
             const res = await apiRequest("GET", url);
             return res.json();
-        }
+        },
+        enabled: (workspaceId !== undefined && workspaceId !== null) || !!localStorage.getItem("token")
     });
 
     return {

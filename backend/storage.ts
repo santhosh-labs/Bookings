@@ -123,12 +123,12 @@ export class DatabaseStorage implements IStorage {
       ownerId
     });
     const workspaceId = result.insertId;
-    
+
     // Create membership for owner
     await db.insert(memberships).values({
       userId: ownerId,
       workspaceId,
-      role: "OWNER",
+      role: "SUPER_ADMIN",
       createdAt: new Date().toISOString()
     });
 
@@ -147,12 +147,12 @@ export class DatabaseStorage implements IStorage {
     const mems = await db.select().from(memberships).where(eq(memberships.workspaceId, workspaceId));
     const userIds = mems.map(m => m.userId);
     if (userIds.length === 0) return [];
-    
+
     const userList = await db.select().from(users).where(inArray(users.id, userIds));
-    
+
     return mems.map(m => {
       const user = userList.find(u => u.id === m.userId);
-      return { 
+      return {
         ...user,
         ...m,
         id: m.id, // Keep membership ID
@@ -262,7 +262,7 @@ export class DatabaseStorage implements IStorage {
     const filters = [];
     if (workspaceId) filters.push(eq(bookings.workspaceId, workspaceId));
     if (serviceId) filters.push(eq(bookings.serviceId, serviceId));
-    
+
     if (filters.length > 0) {
       return await db.select().from(bookings).where(and(...filters)).orderBy(desc(bookings.id));
     }
@@ -394,7 +394,7 @@ export class DatabaseStorage implements IStorage {
       const filters = [];
       if (workspaceId) filters.push(eq(bookings.workspaceId, workspaceId));
       if (serviceId) filters.push(eq(bookings.serviceId, serviceId));
-      
+
       const [todayCountRes, upcomingCountRes, revenueRes] = await Promise.all([
         db.select({ count: count() }).from(bookings).where(and(...filters, eq(bookings.date, today))),
         db.select({ count: count() }).from(bookings).where(and(...filters, eq(bookings.status, "Upcoming"))),

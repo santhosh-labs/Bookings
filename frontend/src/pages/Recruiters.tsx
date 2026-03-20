@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Users, Mail, Shield, MoreVertical, Loader2, Search, UserMinus, UserPlus, Fingerprint } from "lucide-react";
 import { useRecruiters } from "../hooks/use-recruiters";
-import InviteMemberModal from "../components/modals/InviteMemberModal";
+import InviteRecruiterModal from "../components/modals/InviteRecruiterModal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function Recruiters() {
-    const { data: recruiters = [], isLoading } = useRecruiters();
+    const { data: recruiters = [], isLoading, refresh } = useRecruiters();
     const [search, setSearch] = useState("");
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -42,9 +42,13 @@ export default function Recruiters() {
                 </Button>
             </div>
 
-            <InviteMemberModal 
+            <InviteRecruiterModal 
                 isOpen={isInviteModalOpen}
                 onClose={() => setIsInviteModalOpen(false)}
+                onSuccess={() => {
+                    // Refresh the recruiters list
+                    refresh();
+                }}
             />
 
             {/* Table Area */}

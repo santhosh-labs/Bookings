@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { User } from "@shared/schema";
+import type { User, Staff } from "@shared/schema";
 import { apiRequest } from "../lib/queryClient";
 
 export function useAuth() {
@@ -28,6 +28,9 @@ export function useAuth() {
         },
         onSuccess: (data) => {
             localStorage.setItem("token", data.token);
+            if (data.workspaces && data.workspaces.length > 0) {
+               localStorage.setItem("role", data.workspaces[0].role);
+            }
             queryClient.setQueryData(["/api/me"], data.user);
             queryClient.invalidateQueries();
         }
@@ -40,6 +43,7 @@ export function useAuth() {
         },
         onSuccess: (data) => {
             localStorage.setItem("token", data.token);
+            localStorage.setItem("role", "SUPER_ADMIN");
             queryClient.setQueryData(["/api/me"], data.user);
             queryClient.invalidateQueries();
         }
@@ -51,8 +55,15 @@ export function useAuth() {
             return res.json();
         },
         onSuccess: (data) => {
+            const currentUser = queryClient.getQueryData(["/api/me"]);
             localStorage.setItem("token", data.token);
             localStorage.setItem("role", data.role);
+            
+            // Clear cache but preserve current user to prevent AuthGuard redirect loops
+            queryClient.clear();
+            if (currentUser) {
+                queryClient.setQueryData(["/api/me"], currentUser);
+            }
             queryClient.invalidateQueries();
         }
     });

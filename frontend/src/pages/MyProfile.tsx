@@ -33,8 +33,9 @@ export default function MyProfile() {
             return res.json();
         },
         onSuccess: (updatedUser) => {
-            queryClient.setQueryData(["/api/user"], updatedUser);
+            queryClient.setQueryData(["/api/me"], updatedUser);
             queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/users"] });
             setIsEditing(false);
             toast({
                 title: "Profile Updated",

@@ -4,14 +4,19 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { hashPassword, authenticateToken } from "./auth";
+import { sendInvitationEmail } from "./lib/email";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure Multer
 const storage_multer = multer.diskStorage({
   destination: (req, file, cb) => {
-    const dir = path.resolve(process.cwd(), "backend", "uploads");
+    const dir = path.resolve(__dirname, "uploads");
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -95,7 +100,7 @@ export async function registerRoutes(
 
   app.patch('/api/workspaces/:id', authenticateToken, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
       
       const workspace = await storage.updateWorkspace(id, req.body);
@@ -108,7 +113,21 @@ export async function registerRoutes(
 
   // Users (Memberships)
   app.get('/api/users', authenticateToken, async (req, res) => {
-    const workspaceId = getWorkspaceId(req);
+    let workspaceId = getWorkspaceId(req);
+    
+    // Fallback/Override from query param if provided
+    if (req.query.workspaceId) {
+      const queryId = parseInt(req.query.workspaceId as string);
+      if (!isNaN(queryId)) {
+        const userWorkspaces = await storage.getWorkspacesForUser((req as any).user.id);
+        if (userWorkspaces.some(w => w.id === queryId)) {
+          workspaceId = queryId;
+        } else {
+          return res.status(403).json({ message: "Access denied to this workspace" });
+        }
+      }
+    }
+
     if (!workspaceId) return res.status(400).json({ message: "No workspace selected" });
     const members = await storage.getMemberships(workspaceId);
     res.json(members);
@@ -118,16 +137,18 @@ export async function registerRoutes(
     try {
       const workspaceId = getWorkspaceId(req);
       if (!workspaceId) return res.status(400).json({ message: "No workspace selected" });
-      if ((req as any).role !== "OWNER") return res.status(403).json({ message: "Owner privilege required" });
+      if ((req as any).role !== "SUPER_ADMIN") return res.status(403).json({ message: "Super Admin privilege required" });
       
       const { email, name, role } = req.body;
       let user = await storage.getUserByEmail(email);
+      let isNewUser = false;
       
       if (!user) {
         // Create a new user if they don't exist
+        isNewUser = true;
         const tempPassword = await hashPassword("Welcome123!");
         user = await storage.createUser({ 
-          name: name || "New Member", 
+          name: name || email.split('@')[0], 
           email, 
           password: tempPassword 
         });
@@ -138,6 +159,23 @@ export async function registerRoutes(
         workspaceId,
         role: (role || "STAFF").toUpperCase()
       });
+
+      // Send email after successful membership creation
+      try {
+        const workspace = await storage.getWorkspace(workspaceId);
+        const host = (req.get('origin') as string) || 'http://localhost:5173';
+        const inviteLink = `${host}/auth?email=${encodeURIComponent(email)}`;
+        
+        await sendInvitationEmail({
+          email,
+          workspaceName: workspace?.name || "Saas Scheduler",
+          role: (role || "STAFF").toUpperCase(),
+          inviteLink
+        });
+      } catch (emailErr) {
+        console.error("Non-blocking email failure:", emailErr);
+      }
+      
       res.status(201).json(membership);
     } catch (err: any) {
       res.status(400).json({ message: err.message });

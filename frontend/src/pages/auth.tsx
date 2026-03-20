@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ const registerSchema = z.object({
 
 export default function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login, register, user } = useAuth();
   
   useEffect(() => {
@@ -37,12 +38,19 @@ export default function AuthPage({ isLogin = true }: { isLogin?: boolean }) {
   const form = useForm({
     resolver: zodResolver(isLogin ? loginSchema : registerSchema),
     defaultValues: {
-      email: "",
+      email: searchParams.get("email") || "",
       password: "",
       name: "",
       organizationName: ""
     }
   });
+
+  useEffect(() => {
+    const email = searchParams.get("email");
+    if (email) {
+      form.setValue("email", email);
+    }
+  }, [searchParams, form]);
 
   if (user) {
     return null;

@@ -54,20 +54,33 @@ declare global {
 export function setupAuth(app: Express) {
   // Global login
   app.post("/api/login", async (req, res) => {
-    const { email, password } = req.body;
-    const user = await storage.getUserByEmail(email);
-    
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+    try {
+      const { email, password } = req.body;
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    const isMatch = await comparePasswords(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+      const isMatch = await comparePasswords(password, user.password);
+      if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
-    const workspaces = await storage.getWorkspacesForUser(user.id);
-    
-    // Generate an initial token for the user
-    const token = generateToken({ userId: user.id });
-    
-    res.json({ token, user, workspaces });
+      const workspaces = await storage.getWorkspacesForUser(user.id);
+      
+      // Pick the first workspace as default if available
+      const organizationId = workspaces.length > 0 ? workspaces[0].id : undefined;
+      const role = workspaces.length > 0 ? workspaces[0].role : undefined;
+
+      // Generate an initial token for the user
+      const token = generateToken({ 
+        userId: user.id,
+        organizationId,
+        role
+      });
+      
+      res.json({ token, user, workspaces });
+    } catch (err: any) {
+      console.error("LOGIN ERROR:", err);
+      res.status(500).json({ message: err.message || "Authentication failed" });
+    }
   });
 
   // Global register
@@ -89,7 +102,7 @@ export function setupAuth(app: Express) {
     const token = generateToken({ 
       userId: user.id, 
       organizationId: workspace.id, 
-      role: "OWNER" 
+      role: "SUPER_ADMIN" 
     });
 
     res.status(201).json({ token, user, workspace });
@@ -116,5 +129,22 @@ export function setupAuth(app: Express) {
 
   app.get("/api/me", authenticateToken, (req, res) => {
     res.json((req as any).user);
+  });
+
+  app.patch("/api/me", authenticateToken, async (req, res) => {
+    try {
+      const user = (req as any).user;
+      const { name, phone, avatar } = req.body;
+      
+      const updated = await storage.updateUser(user.id, {
+        name,
+        phone,
+        avatar
+      });
+      
+      res.json(updated);
+    } catch (err: any) {
+      res.status(400).json({ message: err.message });
+    }
   });
 }

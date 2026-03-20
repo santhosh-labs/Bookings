@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useServices, useService } from "@/hooks/use-services";
 import { useCreateBooking } from "@/hooks/use-bookings";
 import { usePublicWorkspace } from "@/hooks/use-public-workspace";
+import { useAvailability } from "@/hooks/use-availability";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,11 +39,59 @@ export function BookingContent({ theme, services, workspaceId, previewMode }: Bo
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
   const [isSuccess, setIsSuccess] = useState(false);
-  const createBooking = useCreateBooking();
-
   const primaryColor = theme.primaryColor || "#5E48B8";
-  const timeSlots = ["09:00 AM", "10:00 AM", "11:30 AM", "01:00 PM", "02:30 PM", "04:00 PM"];
-  const dates = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
+  const createBooking = useCreateBooking();
+  
+  // Dynamic Availability
+  const { data: availabilityData } = useAvailability(workspaceId);
+  const schedule = availabilityData?.schedule || {};
+  
+  // Helper to generate time slots for the selected date
+  const generateTimeSlots = () => {
+    if (!selectedService || !availabilityData) return [];
+    
+    // Get day of week for selected date
+    const dayName = format(selectedDate, "EEEE");
+    const daySchedule = schedule[dayName];
+    
+    // If day is not active, return no slots
+    if (!daySchedule?.active) return [];
+    
+    const slots = [];
+    const [startHour, startMin] = daySchedule.start.split(":").map(Number);
+    const [endHour, endMin] = daySchedule.end.split(":").map(Number);
+    
+    let current = new Date(selectedDate);
+    current.setHours(startHour, startMin, 0, 0);
+    
+    const end = new Date(selectedDate);
+    end.setHours(endHour, endMin, 0, 0);
+    
+    const durationMinutes = selectedService.duration || 60;
+    
+    while (current.getTime() + durationMinutes * 60000 <= end.getTime()) {
+      slots.push(format(current, "hh:mm a").toUpperCase());
+      current = new Date(current.getTime() + durationMinutes * 60000);
+    }
+    
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+  
+  // Calculate next 14 days, but filter by availability
+  const dates = Array.from({ length: 14 }, (_, i) => addDays(new Date(), i))
+    .filter(date => {
+      const dayName = format(date, "EEEE");
+      return schedule[dayName]?.active;
+    });
+
+  // Ensure selectedDate is one of the valid dates
+  useEffect(() => {
+    if (dates.length > 0 && !dates.find(d => d.toDateString() === selectedDate.toDateString())) {
+      setSelectedDate(dates[0]);
+    }
+  }, [dates, selectedDate]);
 
   const handleComplete = async () => {
     if (previewMode) {
@@ -207,6 +256,13 @@ export function BookingContent({ theme, services, workspaceId, previewMode }: Bo
                     <div>
                       <Label className="mb-4 block text-slate-400 font-black uppercase text-[10px] tracking-widest">Available Dates</Label>
                       <div className="space-y-3">
+                        {dates.length === 0 && (
+                          <div className="p-10 bg-slate-50 border border-slate-100 rounded-[2rem] text-center">
+                            <CalendarDays className="w-10 h-10 text-slate-200 mx-auto mb-4" />
+                            <p className="text-slate-500 font-bold">No available dates found</p>
+                            <p className="text-slate-400 text-xs mt-1">Please try again later when more slots are opened.</p>
+                          </div>
+                        )}
                         {dates.map((date, i) => (
                           <div
                             key={i}
@@ -341,7 +397,9 @@ export default function PublicBooking() {
     (!serviceId && workspace) ? (workspace as any).id : null
   );
 
-  if (serviceLoading || wsLoading || (!serviceId && servicesLoading)) {
+  const { data: availability, isLoading: availabilityLoading } = useAvailability((workspace as any)?.id);
+  
+  if (serviceLoading || wsLoading || availabilityLoading || (!serviceId && servicesLoading)) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <Loader2 className="w-10 h-10 animate-spin text-[#5E48B8]" />

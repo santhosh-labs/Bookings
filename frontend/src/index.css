@@ -217,9 +217,9 @@
   }
 }
 
-/* Remove neon glow effects */
-[class*="drop-shadow-[0_0"] {
-  filter: none !important;
+/* Enhance premium gradients and glows */
+.glass-effect {
+  @apply bg-white/70 backdrop-blur-md border border-white/20;
 }
 
 /* Custom scrollbar */

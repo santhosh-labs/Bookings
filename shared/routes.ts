@@ -83,9 +83,9 @@ export const api = {
     register: {
       method: "POST" as const,
       path: "/api/register" as const,
-      input: z.object({ 
-        name: z.string(), 
-        email: z.string().email(), 
+      input: z.object({
+        name: z.string(),
+        email: z.string().email(),
         password: z.string(),
         organizationName: z.string().optional()
       }),
@@ -101,6 +101,11 @@ export const api = {
       method: 'GET' as const,
       path: '/api/me' as const,
       responses: { 200: z.any() } // Will return User
+    },
+    updateMe: {
+      method: 'PATCH' as const,
+      path: '/api/me' as const,
+      responses: { 200: z.any() }
     }
   },
   customers: {

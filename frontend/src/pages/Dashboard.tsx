@@ -25,13 +25,38 @@ import TrendsModal from "../components/modals/TrendsModal";
 import CreateBookingModal from "../components/modals/CreateBookingModal";
 
 export default function Dashboard() {
-  const { currentWorkspace, workspaces } = useWorkspace();
+  const { currentWorkspace, workspaces, isLoading: isLoadingWorkspaces } = useWorkspace();
   const { data: bookings = [], isLoading: isLoadingBookings } = useBookings(currentWorkspace?.id ?? null);
   const { data: dashboardStats, isLoading: isLoadingStats } = useDashboardStats(currentWorkspace?.id ?? null);
   
   const [trendsModalOpen, setTrendsModalOpen] = useState(false);
   const [customerModalOpen, setCustomerModalOpen] = useState(false);
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
+  if (isLoadingWorkspaces || (currentWorkspace && isLoadingStats)) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (workspaces.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in">
+        <div className="w-24 h-24 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center border-2 border-primary/20 shadow-xl shadow-primary/5">
+          <CalendarDays className="w-12 h-12" />
+        </div>
+        <div className="max-w-md space-y-2">
+          <h2 className="text-3xl font-display font-bold">Welcome to Appointify</h2>
+          <p className="text-muted-foreground text-lg text-pretty">Create your first workspace to start managing appointments and event types like a pro.</p>
+        </div>
+        <Button asChild className="h-12 px-8 rounded-xl font-bold shadow-lg shadow-primary/20">
+          <Link to="/workspaces/new">Create Workspace</Link>
+        </Button>
+      </div>
+    );
+  }
 
   const stats = [
     { 
@@ -76,23 +101,6 @@ export default function Dashboard() {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
   };
-
-  if (workspaces.length === 0 && !isLoadingStats) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in">
-        <div className="w-24 h-24 bg-primary/10 text-primary rounded-[2rem] flex items-center justify-center border-2 border-primary/20 shadow-xl shadow-primary/5">
-          <CalendarDays className="w-12 h-12" />
-        </div>
-        <div className="max-w-md space-y-2">
-          <h2 className="text-3xl font-display font-bold">Welcome to Appointify</h2>
-          <p className="text-muted-foreground text-lg text-pretty">Create your first workspace to start managing appointments and event types like a pro.</p>
-        </div>
-        <Button asChild className="h-12 px-8 rounded-xl font-bold shadow-lg shadow-primary/20">
-          <Link to="/workspaces/new">Create Workspace</Link>
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <motion.div 
