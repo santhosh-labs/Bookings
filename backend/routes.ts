@@ -51,6 +51,10 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // API Health check/Root
+  app.get("/", (_req, res) => {
+    res.json({ message: "SaaS Scheduler API is running" });
+  });
 
   // File Uploads
   app.post("/api/upload", (req, res, next) => {
