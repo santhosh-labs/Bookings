@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
+  "scripts": {
+    "start": "pnpm --prefix backend start",
+    "dev:backend": "pnpm --prefix backend dev",
+    "dev:frontend": "pnpm --prefix frontend dev",
+    "build:frontend": "pnpm --prefix frontend build"
+  },
   "dependencies": {
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",

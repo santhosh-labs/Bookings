@@ -7,6 +7,8 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
 export async function apiRequest(
   method: string,
   url: string,
@@ -18,7 +20,9 @@ export async function apiRequest(
   if (data) headers["Content-Type"] = "application/json";
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(url, {
+  const fullUrl = url.startsWith("http") ? url : `${API_BASE}${url}`;
+  
+  const res = await fetch(fullUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
@@ -38,7 +42,10 @@ export const getQueryFn: <T>(options: {
     const headers: Record<string, string> = {};
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
-    const res = await fetch(queryKey.join("/") as string, {
+    const path = queryKey.join("/");
+    const fullUrl = path.startsWith("http") ? path : `${API_BASE}/${path}`;
+
+    const res = await fetch(fullUrl, {
       credentials: "include",
       headers
     });

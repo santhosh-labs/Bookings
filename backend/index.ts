@@ -12,6 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 import { setupAuth } from "./auth";
+import cors from "cors";
 
 // Global error handlers to prevent silent crashes
 process.on("unhandledRejection", (reason, promise) => {
@@ -24,6 +25,10 @@ process.on("uncaughtException", (err) => {
 });
 
 const app = express();
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 const httpServer = createServer(app);
 
 declare module "http" {
