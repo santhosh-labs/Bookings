@@ -55,16 +55,23 @@ export async function registerRoutes(
       }
 
       try {
+        console.log(`[File Upload] Starting upload to Vercel Blob: ${req.file.originalname}`);
+        if (!process.env.BLOB_READ_WRITE_TOKEN) {
+            console.error("[File Upload] Error: BLOB_READ_WRITE_TOKEN is missing!");
+            return res.status(500).json({ message: "Cloud storage token missing" });
+        }
+
         // Upload to Vercel Blob
         const blob = await put(req.file.originalname, req.file.buffer, {
           access: 'public',
           token: process.env.BLOB_READ_WRITE_TOKEN
         });
         
+        console.log(`[File Upload] Successfully uploaded: ${blob.url}`);
         res.json({ url: blob.url });
-      } catch (blobErr) {
-        console.error("Vercel Blob upload error:", blobErr);
-        res.status(500).json({ message: "Cloud upload failed" });
+      } catch (blobErr: any) {
+        console.error("[File Upload] Vercel Blob upload error:", blobErr.message);
+        res.status(500).json({ message: `Cloud upload failed: ${blobErr.message}` });
       }
     });
   });
