@@ -38,6 +38,7 @@ import { useDashboardStats } from "../hooks/use-dashboard";
 import { useWorkspace } from "../contexts/WorkspaceContext";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { BarChart3, TrendingUp, DollarSign, Calendar as CalendarIcon, List as ListIcon } from "lucide-react";
+import { API_BASE } from "../lib/queryClient";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -194,7 +195,7 @@ export default function BookingPageDetail() {
         formDataUpload.append("image", file);
 
         try {
-            const res = await fetch("/api/upload", {
+            const res = await fetch(`${API_BASE}/api/upload`, {
                 method: "POST",
                 body: formDataUpload,
             });

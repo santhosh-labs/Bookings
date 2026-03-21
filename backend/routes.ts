@@ -6,6 +6,7 @@ import { z } from "zod";
 import { hashPassword, authenticateToken } from "./auth";
 import { sendInvitationEmail } from "./lib/email";
 import multer from "multer";
+import { put } from "@vercel/blob";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
@@ -13,23 +14,9 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Configure Multer
-const storage_multer = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.resolve(__dirname, "uploads");
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  },
-});
-
+// Configure Multer for Vercel Blob (Memory Storage)
 const upload = multer({
-  storage: storage_multer,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|webp/;
@@ -58,7 +45,7 @@ export async function registerRoutes(
 
   // File Uploads
   app.post("/api/upload", (req, res, next) => {
-    upload.single("image")(req, res, (err) => {
+    upload.single("image")(req, res, async (err) => {
       if (err) {
         console.error("Multer upload error:", err);
         return res.status(400).json({ message: err.message || "Upload failed" });
@@ -66,8 +53,19 @@ export async function registerRoutes(
       if (!req.file) {
         return res.status(400).json({ message: "No file uploaded" });
       }
-      const filePath = `/uploads/${req.file.filename}`;
-      res.json({ url: filePath });
+
+      try {
+        // Upload to Vercel Blob
+        const blob = await put(req.file.originalname, req.file.buffer, {
+          access: 'public',
+          token: process.env.BLOB_READ_WRITE_TOKEN
+        });
+        
+        res.json({ url: blob.url });
+      } catch (blobErr) {
+        console.error("Vercel Blob upload error:", blobErr);
+        res.status(500).json({ message: "Cloud upload failed" });
+      }
     });
   });
 

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useCreateService } from "../../hooks/use-services";
 import { useRecruiters } from "../../hooks/use-recruiters";
 import { useWorkspace } from "../../contexts/WorkspaceContext";
+import { API_BASE } from "../../lib/queryClient";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { CheckCircle2, Search } from "lucide-react";
 
@@ -131,7 +132,7 @@ export default function CreateServiceModal({ isOpen, onClose, workspaceId, onSuc
         formData.append("image", file);
 
         try {
-            const res = await fetch("/api/upload", {
+            const res = await fetch(`${API_BASE}/api/upload`, {
                 method: "POST",
                 body: formData,
             });

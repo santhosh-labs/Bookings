@@ -7,7 +7,7 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+export const API_BASE = import.meta.env.VITE_API_URL || "";
 
 export async function apiRequest(
   method: string,
