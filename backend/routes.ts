@@ -167,8 +167,8 @@ export async function registerRoutes(
       // Send email after successful membership creation
       try {
         const workspace = await storage.getWorkspace(workspaceId);
-        const host = (req.get('origin') as string) || 'http://localhost:5173';
-        const inviteLink = `${host}/auth?email=${encodeURIComponent(email)}`;
+        const host = process.env.FRONTEND_URL || (req.get('origin') as string) || 'http://localhost:5173';
+        const inviteLink = `${host}/login?email=${encodeURIComponent(email)}`;
         
         await sendInvitationEmail({
           email,
@@ -216,7 +216,7 @@ export async function registerRoutes(
 
   app.put(api.services.update.path, authenticateToken, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) throw new Error("Invalid ID");
       const input = api.services.update.input.parse(req.body);
       const service = await storage.updateService(id, input);
@@ -228,7 +228,7 @@ export async function registerRoutes(
   });
 
   app.delete(api.services.delete.path, authenticateToken, async (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
     await storage.deleteService(id);
     res.status(204).end();
@@ -275,7 +275,7 @@ export async function registerRoutes(
 
   app.patch(api.bookings.updateStatus.path, authenticateToken, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) throw new Error("Invalid ID");
       const input = api.bookings.updateStatus.input.parse(req.body);
       const booking = await storage.updateBookingStatus(id, input.status);
@@ -287,7 +287,7 @@ export async function registerRoutes(
 
   app.patch(api.bookings.update.path, authenticateToken, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) throw new Error("Invalid ID");
       const input = api.bookings.update.input.parse(req.body);
       const booking = await storage.updateBooking(id, input);
@@ -333,7 +333,7 @@ export async function registerRoutes(
 
   app.patch(api.notifications.markRead.path, authenticateToken, async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
+      const id = parseInt(req.params.id as string);
       if (isNaN(id)) throw new Error("Invalid ID");
       await storage.markNotificationRead(id);
       res.json({ id });
@@ -367,7 +367,7 @@ export async function registerRoutes(
   });
 
   app.delete(api.workflows.delete.path, authenticateToken, async (req, res) => {
-    const id = parseInt(req.params.id);
+    const id = parseInt(req.params.id as string);
     if (isNaN(id)) return res.status(400).json({ message: "Invalid ID" });
     await storage.deleteWorkflow(id);
     res.status(204).end();
