@@ -104,7 +104,7 @@ export default function Recruiters() {
                                                 <Avatar className="w-11 h-11 border-2 border-slate-100 shadow-sm">
                                                     <AvatarImage src={recruiter.avatar || undefined} />
                                                     <AvatarFallback className="bg-[#f1f5f9] text-slate-600 font-black text-sm">
-                                                        {recruiter.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                                                        {recruiter.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                                                     </AvatarFallback>
                                                 </Avatar>
                                                 <div>

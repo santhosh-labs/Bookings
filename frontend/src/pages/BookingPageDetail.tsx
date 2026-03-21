@@ -796,7 +796,7 @@ export default function BookingPageDetail() {
                                                              <Avatar className="w-10 h-10 border-2 border-white shadow-sm">
                                                                  <AvatarImage src={recruiter.avatar || undefined} />
                                                                  <AvatarFallback className="bg-slate-100 text-slate-600 font-bold text-[10px]">
-                                                                     {recruiter.name.split(' ').map(n => n[0]).join('')}
+                                                                     {recruiter.name.split(' ').map((n: string) => n[0]).join('')}
                                                                  </AvatarFallback>
                                                              </Avatar>
                                                              <div>

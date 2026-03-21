@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/use-auth";
+import { useWorkspace } from "../contexts/WorkspaceContext";
 import { User, Mail, Shield, Smartphone, MapPin, Loader2, Save, X, Edit2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "../lib/queryClient";
@@ -8,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export default function MyProfile() {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading: authLoading } = useAuth();
+    const { role } = useWorkspace();
     const queryClient = useQueryClient();
     const { toast } = useToast();
 
@@ -51,7 +53,7 @@ export default function MyProfile() {
         }
     });
 
-    if (isLoading) {
+    if (authLoading) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
@@ -129,7 +131,7 @@ export default function MyProfile() {
                                 ) : (
                                     <h3 className="text-2xl font-black text-slate-900">{user?.name}</h3>
                                 )}
-                                <p className="text-[#5E48B8] font-bold inline-flex px-3 py-1 bg-indigo-50 rounded-lg text-sm">{user?.role}</p>
+                                <p className="text-[#5E48B8] font-bold inline-flex px-3 py-1 bg-indigo-50 rounded-lg text-sm">{role || "Member"}</p>
                             </div>
                             
                             <div className="space-y-5">

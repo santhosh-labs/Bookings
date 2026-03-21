@@ -502,7 +502,7 @@ export default function CreateServiceModal({ isOpen, onClose, workspaceId, onSuc
                                                                                 <Avatar className="w-8 h-8 border-2 border-white shadow-sm shrink-0">
                                                                                     <AvatarImage src={recruiter.avatar || undefined} />
                                                                                     <AvatarFallback className="bg-slate-100 text-slate-600 font-black text-[8px]">
-                                                                                        {recruiter.name.split(' ').map(n => n[0]).join('')}
+                                                                                        {recruiter.name.split(' ').map((n: string) => n[0]).join('')}
                                                                                     </AvatarFallback>
                                                                                 </Avatar>
                                                                                 <div className="min-w-0">

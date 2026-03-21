@@ -14,7 +14,16 @@ export default function CreateWorkspace() {
         setIsLoading(true);
         try {
             const slug = name.toLowerCase().replace(/ /g, "-");
-            await addWorkspace({ name, slug, currency: "USD", timezone: "UTC" });
+            await addWorkspace({ 
+                name, 
+                slug, 
+                currency: "USD", 
+                timezone: "UTC",
+                description: null,
+                logo: null,
+                ownerId: null,
+                theme: null
+            });
             navigate("/dashboard");
         } catch (err) {
             alert("Failed to create workspace");

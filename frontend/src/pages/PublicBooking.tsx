@@ -44,7 +44,7 @@ export function BookingContent({ theme, services, workspaceId, previewMode }: Bo
   
   // Dynamic Availability
   const { data: availabilityData } = useAvailability(workspaceId);
-  const schedule = availabilityData?.schedule || {};
+  const schedule = (availabilityData?.schedule || {}) as Record<string, any>;
   
   // Helper to generate time slots for the selected date
   const generateTimeSlots = () => {
